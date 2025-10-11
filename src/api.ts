@@ -12,8 +12,8 @@ async function fetchWithAuth(url: string): Promise<Response> {
     "Content-Type": "application/json",
   };
 
-  if (preferences.authToken) {
-    headers["Authorization"] = `Bearer ${preferences.authToken}`;
+  if (preferences.sessionCookie) {
+    headers["Cookie"] = `uds_session=${preferences.sessionCookie}`;
   }
 
   const response = await fetch(url, { headers });

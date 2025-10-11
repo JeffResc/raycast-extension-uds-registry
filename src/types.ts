@@ -67,5 +67,5 @@ export interface PackageMetadata {
 
 export interface Preferences {
   registryUrl?: string;
-  authToken?: string;
+  sessionCookie?: string;
 }

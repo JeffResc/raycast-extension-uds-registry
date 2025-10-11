@@ -33,12 +33,12 @@
       "placeholder": "https://registry.defenseunicorns.com"
     },
     {
-      "name": "authToken",
+      "name": "sessionCookie",
       "type": "password",
       "required": false,
-      "title": "Authentication Token (Optional)",
-      "description": "Bearer token from your browser session for enhanced data access. Leave empty for public access.",
-      "placeholder": "Paste your bearer token here"
+      "title": "Session Cookie (Optional)",
+      "description": "Value of the 'uds_session' cookie from your browser for authenticated access. Get it from DevTools → Application → Cookies → registry.defenseunicorns.com → uds_session. Leave empty for public access.",
+      "placeholder": "Paste uds_session cookie value here"
     }
   ],
   "dependencies": {
