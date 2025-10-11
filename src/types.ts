@@ -68,4 +68,6 @@ export interface PackageMetadata {
 export interface Preferences {
   registryUrl?: string;
   sessionCookie?: string;
+  ignorePublic?: boolean;
+  ignoreAirgapStore?: boolean;
 }

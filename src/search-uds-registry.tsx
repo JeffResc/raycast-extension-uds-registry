@@ -1,7 +1,7 @@
-import { Action, ActionPanel, List, showToast, Toast, Icon } from "@raycast/api";
+import { Action, ActionPanel, List, showToast, Toast, Icon, getPreferenceValues } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { fetchCatalog } from "./api";
-import { CatalogPackage } from "./types";
+import { CatalogPackage, Preferences } from "./types";
 import { PackageDetail } from "./package-detail";
 
 interface PackageWithOrg extends CatalogPackage {
@@ -18,10 +18,19 @@ export default function Command() {
       try {
         setIsLoading(true);
         const response = await fetchCatalog();
+        const preferences = getPreferenceValues<Preferences>();
 
         // Convert catalog response to array of packages with org info
         const packageArray: PackageWithOrg[] = [];
         Object.entries(response.catalog).forEach(([orgName, orgData]) => {
+          // Skip organizations based on preferences
+          if (preferences.ignorePublic && orgName === "public") {
+            return;
+          }
+          if (preferences.ignoreAirgapStore && orgName === "airgap-store") {
+            return;
+          }
+
           orgData.repos.forEach((pkg) => {
             packageArray.push({
               ...pkg,

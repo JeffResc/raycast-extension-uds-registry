@@ -39,6 +39,24 @@
       "title": "Session Cookie (Optional)",
       "description": "Value of the 'uds_session' cookie from your browser for authenticated access. Get it from DevTools → Application → Cookies → registry.defenseunicorns.com → uds_session. Leave empty for public access.",
       "placeholder": "Paste uds_session cookie value here"
+    },
+    {
+      "name": "ignorePublic",
+      "type": "checkbox",
+      "required": false,
+      "title": "Hide 'public' organization packages",
+      "label": "Ignore public org",
+      "description": "Hide packages from the 'public' organization in search results",
+      "default": false
+    },
+    {
+      "name": "ignoreAirgapStore",
+      "type": "checkbox",
+      "required": false,
+      "title": "Hide 'airgap-store' organization packages",
+      "label": "Ignore airgap-store org",
+      "description": "Hide packages from the 'airgap-store' organization in search results",
+      "default": false
     }
   ],
   "dependencies": {
