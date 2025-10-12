@@ -54,7 +54,9 @@ export function CopyPackageReference({ org, packageName, packageData }: CopyPack
   };
 
   const getOciRef = async (version: string, flavor: string) => {
-    return flavor ? `${baseUrl}/${org}/${packageName}:${version}-${flavor}` : `${baseUrl}/${org}/${packageName}:${version}`;
+    return flavor
+      ? `${baseUrl}/${org}/${packageName}:${version}-${flavor}`
+      : `${baseUrl}/${org}/${packageName}:${version}`;
   };
 
   const handleCopy = async (version: string, flavor: string) => {

@@ -1,7 +1,6 @@
 import { Action, ActionPanel, Detail, Icon, Color } from "@raycast/api";
 import { CatalogPackage } from "./types";
 import { CopyPackageReference } from "./copy-package-reference";
-import { getAccessoriesFromFlavors } from "./utils";
 
 interface PackageDetailProps {
   org: string;
@@ -94,7 +93,7 @@ export function PackageDetail({ org, packageName, packageData }: PackageDetailPr
       actions={
         <ActionPanel>
           <Action.Push
-            title="Insert/copy package reference"
+            title="Insert/copy Package Reference"
             icon={Icon.Clipboard}
             target={<CopyPackageReference org={org} packageName={packageName} packageData={packageData} />}
             shortcut={{ modifiers: ["cmd"], key: "c" }}
