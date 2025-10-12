@@ -22,7 +22,10 @@ A Raycast extension for searching and browsing packages in the UDS Registry (reg
 
 ### For Production
 
-Run `npm run build` to build the extension for production use.
+1. Clone this repository
+2. Run `npm install` to install dependencies
+3. Run `npm run build` to start create a production build
+4. Run the "Import Extension" command in Raycast and select the cloned repo directory.
 
 ## Configuration
 
