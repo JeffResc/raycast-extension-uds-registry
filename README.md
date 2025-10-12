@@ -89,6 +89,9 @@ Open Raycast preferences for this extension to configure:
 - `npm run lint` - Run linter
 - `npm run fix-lint` - Fix linting issues
 
+## Employment Disclosure
+Although I am currently employed by [Defense Unicorns](https://defenseunicorns.com/), this project is not affiliated with the company or an officially supported product.
+
 ## License
 
 MIT
