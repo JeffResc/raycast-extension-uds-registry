@@ -7,10 +7,8 @@ A Raycast extension for searching and browsing packages in the UDS Registry (reg
 - **Search Packages**: Browse and search through all available packages in the UDS Registry catalog
 - **Package Details**: View detailed information about each package including:
   - Available versions and architectures
-  - CVE/vulnerability summaries
-  - Package sizes and metadata
-  - Components and flavors
-- **Public & Authenticated Access**: Works without authentication by default, with optional token support for enhanced data access
+  - Package metadata and flavors
+- **Public & Authenticated Access**: Works without authentication by default, with optional token support for private package access
 - **Configurable Registry**: Support for custom registry URLs
 
 ## Installation
