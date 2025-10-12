@@ -37,7 +37,7 @@
       "type": "password",
       "required": false,
       "title": "Session Cookie (Optional)",
-      "description": "Value of the 'uds_session' cookie from your browser for authenticated access. Get it from DevTools → Application → Cookies → registry.defenseunicorns.com → uds_session. Leave empty for public access.",
+      "description": "⚠️ SECURITY: Treat like a password. DO NOT sync/backup preferences with this value. Value of the 'uds_session' cookie from your browser for authenticated access. Get it from DevTools → Application → Cookies → registry.defenseunicorns.com → uds_session. Leave empty for public access.",
       "placeholder": "Paste uds_session cookie value here"
     },
     {

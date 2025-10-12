@@ -1,6 +1,7 @@
 import { Action, ActionPanel, Detail, Icon, Color } from "@raycast/api";
 import { CatalogPackage } from "./types";
 import { CopyPackageReference } from "./copy-package-reference";
+import { getAccessoriesFromFlavors } from "./utils";
 
 interface PackageDetailProps {
   org: string;
@@ -9,7 +10,6 @@ interface PackageDetailProps {
 }
 
 export function PackageDetail({ org, packageName, packageData }: PackageDetailProps) {
-
   function generateMarkdown(): string {
     let markdown = "";
 
@@ -68,9 +68,25 @@ export function PackageDetail({ org, packageName, packageData }: PackageDetailPr
           </Detail.Metadata.TagList>
           {packageData.flavors && packageData.flavors.length > 0 && (
             <Detail.Metadata.TagList title="Flavors">
-              {packageData.flavors.map((flavor) => (
-                <Detail.Metadata.TagList.Item key={flavor} text={flavor} color={Color.Green} />
-              ))}
+              {packageData.flavors.map((flavor) => {
+                let color: Color | undefined;
+
+                switch (flavor) {
+                  case "upstream":
+                    color = Color.SecondaryText;
+                    break;
+                  case "unicorn":
+                    color = Color.Purple;
+                    break;
+                  case "registry1":
+                    color = Color.Green;
+                    break;
+                  default:
+                    color = undefined;
+                }
+
+                return <Detail.Metadata.TagList.Item key={flavor} text={flavor} color={color} />;
+              })}
             </Detail.Metadata.TagList>
           )}
         </Detail.Metadata>
@@ -78,7 +94,7 @@ export function PackageDetail({ org, packageName, packageData }: PackageDetailPr
       actions={
         <ActionPanel>
           <Action.Push
-            title="Copy Package Reference"
+            title="Insert/copy package reference"
             icon={Icon.Clipboard}
             target={<CopyPackageReference org={org} packageName={packageName} packageData={packageData} />}
             shortcut={{ modifiers: ["cmd"], key: "c" }}
@@ -89,6 +105,20 @@ export function PackageDetail({ org, packageName, packageData }: PackageDetailPr
               url={packageData.url}
               icon={Icon.Globe}
               shortcut={{ modifiers: ["cmd"], key: "o" }}
+            />
+          )}
+          <Action.CopyToClipboard
+            title="Copy Package Name"
+            content={`${org}/${packageName}`}
+            icon={Icon.Text}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+          />
+          {packageData.latest_tag && (
+            <Action.CopyToClipboard
+              title="Copy Latest Version"
+              content={packageData.latest_tag}
+              icon={Icon.Tag}
+              shortcut={{ modifiers: ["cmd"], key: "v" }}
             />
           )}
         </ActionPanel>

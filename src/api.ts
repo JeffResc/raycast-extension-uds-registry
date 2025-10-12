@@ -8,7 +8,7 @@ function getRegistryBaseUrl(): string {
 
 async function fetchWithAuth(url: string): Promise<Response> {
   const preferences = getPreferenceValues<Preferences>();
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
 
@@ -16,23 +16,39 @@ async function fetchWithAuth(url: string): Promise<Response> {
     headers["Cookie"] = `uds_session=${preferences.sessionCookie}`;
   }
 
-  const response = await fetch(url, { headers });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+  try {
+    const response = await fetch(url, {
+      headers,
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error("Request timed out after 10 seconds");
+    }
+    throw error;
   }
-
-  return response;
 }
 
 export async function fetchCatalog(): Promise<CatalogResponse> {
   const baseUrl = getRegistryBaseUrl();
   const response = await fetchWithAuth(`${baseUrl}/uds/catalog`);
-  return await response.json();
+  return (await response.json()) as CatalogResponse;
 }
 
 export async function fetchPackageMetadata(org: string, packageName: string): Promise<PackageMetadata> {
   const baseUrl = getRegistryBaseUrl();
   const response = await fetchWithAuth(`${baseUrl}/uds/metadata/${org}/${packageName}`);
-  return await response.json();
+  return (await response.json()) as PackageMetadata;
 }

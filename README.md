@@ -34,22 +34,27 @@ Open Raycast preferences for this extension to configure:
 - **Default**: `https://registry.defenseunicorns.com`
 - Set a custom registry URL if you're using a different UDS Registry instance
 
-### Authentication Token (Optional)
+### Session Cookie (Optional)
 - **Default**: None (public access)
-- For enhanced data access, you can provide a Bearer token from your authenticated browser session
+- For authenticated access to private packages and enhanced data, you can provide your session cookie from your authenticated browser session
 
-#### How to get your authentication token:
+⚠️ **SECURITY WARNING**: This cookie provides full access to your UDS Registry account. DO NOT backup, sync, or share Raycast preferences containing this cookie. Store it only on your local machine and treat it like a password.
+
+#### How to get your session cookie:
 
 1. Log in to the UDS Registry at https://registry.defenseunicorns.com through your browser (via Keycloak SSO)
 2. Open your browser's Developer Tools (F12 or Cmd+Option+I)
-3. Go to the Network tab
-4. Refresh the page or navigate to a package
-5. Find any request to `registry.defenseunicorns.com`
-6. Look for the `Authorization` header in the request headers
-7. Copy the Bearer token value (everything after "Bearer ")
-8. Paste it into the "Authentication Token" field in Raycast preferences
+3. Go to the **Application** tab (Chrome) or **Storage** tab (Firefox)
+4. In the left sidebar, expand **Cookies** and select `https://registry.defenseunicorns.com`
+5. Find the cookie named `uds_session`
+6. Copy the **Value** of the `uds_session` cookie
+7. Paste it into the "Session Cookie" field in Raycast preferences
 
-Note: The token may expire after some time, and you'll need to retrieve a fresh one.
+**Important Notes:**
+- The cookie may expire after some time, and you'll need to retrieve a fresh one
+- Never commit or share this cookie value
+- Disable Raycast preferences sync/backup if you store this cookie
+- This is a temporary solution until OAuth support is available
 
 ## Usage
 
@@ -57,9 +62,27 @@ Note: The token may expire after some time, and you'll need to retrieve a fresh 
 2. Type "Search UDS Registry" or start typing package names
 3. Browse through the list of packages
 4. Press Enter or click to view detailed package information
-5. Use keyboard shortcuts:
-   - `Cmd+O` - Open package repository in browser
-   - `Cmd+C` - Copy package reference to clipboard
+
+### Keyboard Shortcuts
+
+**Search View:**
+- `Enter` - View package details
+- `Cmd+O` - Open package repository in browser
+- `Cmd+C` - Copy package reference (org/package)
+- `Cmd+Shift+C` - Copy package name only
+- `Cmd+V` - Copy latest version tag
+
+**Package Detail View:**
+- `Cmd+I` - Insert package reference with version selection
+- `Cmd+C` - Copy package reference with version selection
+- `Cmd+Shift+C` - Copy package name
+- `Cmd+V` - Copy latest version tag
+- `Cmd+O` - Open repository in browser
+
+**Version Selection View:**
+- `Cmd+I` - Insert OCI reference for selected version
+- `Cmd+C` - Copy OCI reference for selected version
+- `Cmd+B` - Go back to flavor selection (when applicable)
 
 ## Development
 

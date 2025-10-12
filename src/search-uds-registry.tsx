@@ -1,61 +1,62 @@
 import { Action, ActionPanel, List, showToast, Toast, Icon, getPreferenceValues } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { fetchCatalog } from "./api";
-import { CatalogPackage, Preferences } from "./types";
+import { PackageWithOrg, Preferences } from "./types";
 import { PackageDetail } from "./package-detail";
-
-interface PackageWithOrg extends CatalogPackage {
-  orgName: string;
-}
+import { getAccessoriesFromFlavors } from "./utils";
 
 export default function Command() {
   const [packages, setPackages] = useState<PackageWithOrg[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadCatalog() {
-      try {
-        setIsLoading(true);
-        const response = await fetchCatalog();
-        const preferences = getPreferenceValues<Preferences>();
+  const loadCatalog = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await fetchCatalog();
+      const preferences = getPreferenceValues<Preferences>();
 
-        // Convert catalog response to array of packages with org info
-        const packageArray: PackageWithOrg[] = [];
-        Object.entries(response.catalog).forEach(([orgName, orgData]) => {
-          // Skip organizations based on preferences
-          if (preferences.ignorePublic && orgName === "public") {
-            return;
-          }
-          if (preferences.ignoreAirgapStore && orgName === "airgap-store") {
-            return;
-          }
+      // Convert catalog response to array of packages with org info
+      const packageArray: PackageWithOrg[] = [];
+      Object.entries(response.catalog).forEach(([orgName, orgData]) => {
+        // Skip organizations based on preferences
+        if (preferences.ignorePublic && orgName === "public") {
+          return;
+        }
+        if (preferences.ignoreAirgapStore && orgName === "airgap-store") {
+          return;
+        }
 
-          orgData.repos.forEach((pkg) => {
-            packageArray.push({
-              ...pkg,
-              orgName,
-            });
+        orgData.repos.forEach((pkg) => {
+          packageArray.push({
+            ...pkg,
+            orgName,
           });
         });
+      });
 
-        setPackages(packageArray);
-        await showToast({
-          style: Toast.Style.Success,
-          title: "Catalog loaded",
-          message: `Found ${packageArray.length} packages`,
-        });
-      } catch (error) {
-        await showToast({
-          style: Toast.Style.Failure,
-          title: "Failed to load catalog",
-          message: error instanceof Error ? error.message : "Unknown error",
-        });
-      } finally {
-        setIsLoading(false);
-      }
+      setPackages(packageArray);
+      await showToast({
+        style: Toast.Style.Success,
+        title: "Catalog loaded",
+        message: `Found ${packageArray.length} packages`,
+      });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      setError(errorMessage);
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Failed to load catalog",
+        message: errorMessage,
+      });
+    } finally {
+      setIsLoading(false);
     }
+  };
 
+  useEffect(() => {
     loadCatalog();
   }, []);
 
@@ -70,6 +71,24 @@ export default function Command() {
     );
   });
 
+  // Show error state with retry action
+  if (error && !isLoading && packages.length === 0) {
+    return (
+      <List>
+        <List.EmptyView
+          icon={Icon.ExclamationMark}
+          title="Failed to Load Catalog"
+          description={error}
+          actions={
+            <ActionPanel>
+              <Action title="Retry" icon={Icon.ArrowClockwise} onAction={loadCatalog} />
+            </ActionPanel>
+          }
+        />
+      </List>
+    );
+  }
+
   return (
     <List
       isLoading={isLoading}
@@ -82,7 +101,7 @@ export default function Command() {
           key={`${pkg.orgName}/${pkg.repo}`}
           title={`${pkg.orgName} / ${pkg.repo}`}
           subtitle={pkg.tagline || pkg.title}
-          accessories={[]}
+          accessories={getAccessoriesFromFlavors(pkg.flavors || [])}
           icon={pkg.icon || Icon.Box}
           actions={
             <ActionPanel>
@@ -104,6 +123,19 @@ export default function Command() {
                 content={`${pkg.orgName}/${pkg.repo}`}
                 shortcut={{ modifiers: ["cmd"], key: "c" }}
               />
+              <Action.CopyToClipboard
+                title="Copy Package Name"
+                content={pkg.repo}
+                shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+              />
+              {pkg.latest_tag && (
+                <Action.CopyToClipboard
+                  title="Copy Latest Version"
+                  content={pkg.latest_tag}
+                  icon={Icon.Tag}
+                  shortcut={{ modifiers: ["cmd"], key: "v" }}
+                />
+              )}
             </ActionPanel>
           }
         />

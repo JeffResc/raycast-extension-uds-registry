@@ -53,12 +53,26 @@ export function CopyPackageReference({ org, packageName, packageData }: CopyPack
     return Array.from(versionSet).sort().reverse();
   };
 
+  const getOciRef = async (version: string, flavor: string) => {
+    return flavor ? `${baseUrl}/${org}/${packageName}:${version}-${flavor}` : `${baseUrl}/${org}/${packageName}:${version}`;
+  };
+
   const handleCopy = async (version: string, flavor: string) => {
-    const ociRef = `${baseUrl}/${org}/${packageName}:${version}-${flavor}`;
+    const ociRef = await getOciRef(version, flavor);
     await Clipboard.copy(ociRef);
     await showToast({
       style: Toast.Style.Success,
       title: "Copied to clipboard",
+      message: ociRef,
+    });
+  };
+
+  const handleInsert = async (version: string, flavor: string) => {
+    const ociRef = await getOciRef(version, flavor);
+    await Clipboard.paste(ociRef);
+    await showToast({
+      style: Toast.Style.Success,
+      title: "Inserted into frontmost application",
       message: ociRef,
     });
   };
@@ -80,21 +94,26 @@ export function CopyPackageReference({ org, packageName, packageData }: CopyPack
     const versions = Array.from(versionSet).sort().reverse();
 
     return (
-      <List searchBarPlaceholder="Select version to copy...">
+      <List searchBarPlaceholder="Select version to copy..." navigationTitle="Flavor: N/A">
         {versions.map((version) => (
           <List.Item
             key={version}
             title={version}
             icon={Icon.Tag}
-            accessories={
-              version === packageData.latest_tag ? [{ tag: { value: "latest", color: Color.Green } }] : []
-            }
+            accessories={version === packageData.latest_tag ? [{ tag: { value: "latest", color: Color.Green } }] : []}
             actions={
               <ActionPanel>
+                <Action
+                  title="Insert OCI Reference"
+                  icon={Icon.TextInput}
+                  onAction={() => handleInsert(version, "")}
+                  shortcut={{ modifiers: ["cmd"], key: "i" }}
+                />
                 <Action
                   title="Copy OCI Reference"
                   icon={Icon.Clipboard}
                   onAction={() => handleCopy(version, "")}
+                  shortcut={{ modifiers: ["cmd"], key: "c" }}
                 />
               </ActionPanel>
             }
@@ -132,16 +151,6 @@ export function CopyPackageReference({ org, packageName, packageData }: CopyPack
       searchBarPlaceholder={`Select version for ${selectedFlavor}...`}
       navigationTitle={`Flavor: ${selectedFlavor}`}
     >
-      <List.Item
-        key="back"
-        title="← Back to Flavor Selection"
-        icon={Icon.ArrowLeft}
-        actions={
-          <ActionPanel>
-            <Action title="Back" onAction={() => setSelectedFlavor("")} />
-          </ActionPanel>
-        }
-      />
       {versions.map((version) => {
         const isLatest = packageData.latest_tag === `${version}-${selectedFlavor}`;
         return (
@@ -153,11 +162,23 @@ export function CopyPackageReference({ org, packageName, packageData }: CopyPack
             actions={
               <ActionPanel>
                 <Action
+                  title="Insert OCI Reference"
+                  icon={Icon.TextInput}
+                  onAction={() => handleInsert(version, selectedFlavor)}
+                  shortcut={{ modifiers: ["cmd"], key: "i" }}
+                />
+                <Action
                   title="Copy OCI Reference"
                   icon={Icon.Clipboard}
                   onAction={() => handleCopy(version, selectedFlavor)}
+                  shortcut={{ modifiers: ["cmd"], key: "c" }}
                 />
-                <Action title="Change Flavor" icon={Icon.ArrowLeft} onAction={() => setSelectedFlavor("")} />
+                <Action
+                  title="Change Flavor"
+                  icon={Icon.ArrowLeft}
+                  onAction={() => setSelectedFlavor("")}
+                  shortcut={{ modifiers: ["cmd"], key: "b" }}
+                />
               </ActionPanel>
             }
           />

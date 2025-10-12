@@ -16,6 +16,10 @@ export interface CatalogPackage {
   readme?: string;
 }
 
+export interface PackageWithOrg extends CatalogPackage {
+  orgName: string;
+}
+
 export interface CatalogOrg {
   org: string;
   org_custom_name?: string;
