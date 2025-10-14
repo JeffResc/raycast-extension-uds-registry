@@ -53,29 +53,32 @@ export function CopyPackageReference({ org, packageName, packageData }: CopyPack
     return Array.from(versionSet).sort().reverse();
   };
 
-  const getOciRef = async (version: string, flavor: string) => {
-    return flavor
-      ? `${baseUrl}/${org}/${packageName}:${version}-${flavor}`
-      : `${baseUrl}/${org}/${packageName}:${version}`;
+  const getOciRef = (version: string, flavor: string) => {
+    const tag = getTag(version, flavor)
+    return `${baseUrl}/${org}/${packageName}:${tag}`
   };
 
-  const handleCopy = async (version: string, flavor: string) => {
-    const ociRef = await getOciRef(version, flavor);
-    await Clipboard.copy(ociRef);
+  const getTag = (version: string, flavor: string) => {
+    return flavor
+      ? `${version}-${flavor}`
+      : `${version}`;
+  };
+
+  const handleCopy = async (content: string) => {
+    await Clipboard.copy(content);
     await showToast({
       style: Toast.Style.Success,
       title: "Copied to clipboard",
-      message: ociRef,
+      message: content,
     });
   };
 
-  const handleInsert = async (version: string, flavor: string) => {
-    const ociRef = await getOciRef(version, flavor);
-    await Clipboard.paste(ociRef);
+  const handleInsert = async (content: string) => {
+    await Clipboard.paste(content);
     await showToast({
       style: Toast.Style.Success,
       title: "Inserted into frontmost application",
-      message: ociRef,
+      message: content,
     });
   };
 
@@ -108,13 +111,19 @@ export function CopyPackageReference({ org, packageName, packageData }: CopyPack
                 <Action
                   title="Insert OCI Reference"
                   icon={Icon.TextInput}
-                  onAction={() => handleInsert(version, "")}
+                  onAction={() => handleInsert(getOciRef(version, ""))}
                   shortcut={{ modifiers: ["cmd"], key: "i" }}
+                />
+                <Action
+                  title="Insert Tag"
+                  icon={Icon.Tag}
+                  onAction={() => handleInsert(getTag(version, selectedFlavor))}
+                  shortcut={{ modifiers: ["cmd"], key: "t" }}
                 />
                 <Action
                   title="Copy OCI Reference"
                   icon={Icon.Clipboard}
-                  onAction={() => handleCopy(version, "")}
+                  onAction={() => handleCopy(getOciRef(version, ""))}
                   shortcut={{ modifiers: ["cmd"], key: "c" }}
                 />
               </ActionPanel>
@@ -166,13 +175,19 @@ export function CopyPackageReference({ org, packageName, packageData }: CopyPack
                 <Action
                   title="Insert OCI Reference"
                   icon={Icon.TextInput}
-                  onAction={() => handleInsert(version, selectedFlavor)}
+                  onAction={() => handleInsert(getOciRef(version, selectedFlavor))}
                   shortcut={{ modifiers: ["cmd"], key: "i" }}
+                />
+                <Action
+                  title="Insert Tag"
+                  icon={Icon.Tag}
+                  onAction={() => handleInsert(getTag(version, selectedFlavor))}
+                  shortcut={{ modifiers: ["cmd"], key: "t" }}
                 />
                 <Action
                   title="Copy OCI Reference"
                   icon={Icon.Clipboard}
-                  onAction={() => handleCopy(version, selectedFlavor)}
+                  onAction={() => handleCopy(getOciRef(version, selectedFlavor))}
                   shortcut={{ modifiers: ["cmd"], key: "c" }}
                 />
                 <Action
